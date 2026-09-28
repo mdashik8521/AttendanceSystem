@@ -3,12 +3,69 @@
 }
 
 <div class="container mt-4">
-    <h2>Admin Dashboard</h2>
+
+    <h2 class="mb-4">Admin Dashboard</h2>
 
     <p>Welcome, @User.Identity?.Name!</p>
 
     <hr />
 
-    <h4>Admin Panel</h4>
-    <p>Manage users, departments, teachers and students here.</p>
+    <div class="row g-4">
+
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5>Total Students</h5>
+                    <h2>@ViewBag.TotalStudents</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5>Total Teachers</h5>
+                    <h2>@ViewBag.TotalTeachers</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5>Total Departments</h5>
+                    <h2>@ViewBag.TotalDepartments</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5>Total Subjects</h5>
+                    <h2>@ViewBag.TotalSubjects</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5>Class Sessions</h5>
+                    <h2>@ViewBag.TotalSessions</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5>Attendance Records</h5>
+                    <h2>@ViewBag.TotalAttendanceRecords</h2>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
 </div>
