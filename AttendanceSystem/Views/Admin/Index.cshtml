@@ -2,68 +2,202 @@
     ViewData["Title"] = "Admin Dashboard";
 }
 
-<div class="container mt-4">
+<div class="container dashboard-container">
 
-    <h2 class="mb-4">Admin Dashboard</h2>
+    <!-- DASHBOARD HEADER -->
+    <div class="dashboard-header d-flex justify-content-between align-items-center">
 
-    <p>Welcome, @User.Identity?.Name!</p>
+        <div>
+            <h1>Admin Dashboard</h1>
 
-    <hr />
+            <p>
+                Welcome, @User.Identity?.Name!
+            </p>
+        </div>
 
+        <div>
+            <span class="academic-year-badge">
+                Academic Year 2026-2027
+            </span>
+        </div>
+
+    </div>
+
+
+    <!-- DASHBOARD CARDS -->
     <div class="row g-4">
 
+        <!-- STUDENTS -->
         <div class="col-md-4">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5>Total Students</h5>
-                    <h2>@ViewBag.TotalStudents</h2>
+
+            <a asp-controller="Home"
+               asp-action="Students"
+               class="dashboard-link">
+
+                <div class="card dashboard-card shadow-sm">
+
+                    <div class="card-body">
+
+                        <div class="dashboard-icon icon-students">
+                            👨‍🎓
+                        </div>
+
+                        <h5>Total Students</h5>
+
+                        <h2>@ViewBag.TotalStudents</h2>
+
+                        <div class="dashboard-view-button">
+                            View Students →
+                        </div>
+
+                    </div>
+
                 </div>
-            </div>
+
+            </a>
+
         </div>
 
+
+        <!-- TEACHERS -->
         <div class="col-md-4">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5>Total Teachers</h5>
-                    <h2>@ViewBag.TotalTeachers</h2>
+
+            <a asp-controller="Home"
+               asp-action="Teachers"
+               class="dashboard-link">
+
+                <div class="card dashboard-card shadow-sm">
+
+                    <div class="card-body">
+
+                        <div class="dashboard-icon icon-teachers">
+                            👨‍🏫
+                        </div>
+
+                        <h5>Total Teachers</h5>
+
+                        <h2>@ViewBag.TotalTeachers</h2>
+
+                        <div class="dashboard-view-button">
+                            View Teachers →
+                        </div>
+
+                    </div>
+
                 </div>
-            </div>
+
+            </a>
+
         </div>
 
+
+        <!-- DEPARTMENTS -->
         <div class="col-md-4">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5>Total Departments</h5>
-                    <h2>@ViewBag.TotalDepartments</h2>
+
+            <a asp-controller="Admin"
+               asp-action="Departments"
+               class="dashboard-link">
+
+                <div class="card dashboard-card shadow-sm">
+
+                    <div class="card-body">
+
+                        <div class="dashboard-icon icon-departments">
+                            🏢
+                        </div>
+
+                        <h5>Total Departments</h5>
+
+                        <h2>@ViewBag.TotalDepartments</h2>
+
+                        <div class="dashboard-view-button">
+                            View Departments →
+                        </div>
+
+                    </div>
+
                 </div>
-            </div>
+
+            </a>
+
         </div>
 
+
+        <!-- SUBJECTS -->
         <div class="col-md-4">
-            <div class="card shadow-sm">
+
+            <div class="card dashboard-card shadow-sm">
+
                 <div class="card-body">
+
+                    <div class="dashboard-icon icon-subjects">
+                        📚
+                    </div>
+
                     <h5>Total Subjects</h5>
+
                     <h2>@ViewBag.TotalSubjects</h2>
+
+                    <small>
+                        Subjects currently available
+                    </small>
+
                 </div>
+
             </div>
+
         </div>
 
+
+        <!-- CLASS SESSIONS -->
         <div class="col-md-4">
-            <div class="card shadow-sm">
+
+            <div class="card dashboard-card shadow-sm">
+
                 <div class="card-body">
+
+                    <div class="dashboard-icon icon-sessions">
+                        🗓️
+                    </div>
+
                     <h5>Class Sessions</h5>
+
                     <h2>@ViewBag.TotalSessions</h2>
+
+                    <small>
+                        Total class sessions
+                    </small>
+
                 </div>
+
             </div>
+
         </div>
 
+
+        <!-- ATTENDANCE RECORDS -->
         <div class="col-md-4">
-            <div class="card shadow-sm">
+
+            <div class="card dashboard-card shadow-sm">
+
                 <div class="card-body">
+
+                    <div class="dashboard-icon icon-attendance">
+                        📊
+                    </div>
+
                     <h5>Attendance Records</h5>
+
                     <h2>@ViewBag.TotalAttendanceRecords</h2>
+
+                    <small>
+                        Total attendance records
+                    </small>
+
                 </div>
+
             </div>
+
         </div>
 
     </div>

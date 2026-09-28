@@ -1,128 +1,278 @@
 @{
     ViewData["Title"] = "Student Dashboard";
+
+    var student = ViewBag.Student;
+    var attendancePercentage = ViewBag.AttendancePercentage ?? 0;
 }
 
-<div class="container mt-4">
+<div class="container student-dashboard">
 
-    <!-- Header -->
-    <div class="mb-4">
-        <h1 class="fw-bold">Student Dashboard</h1>
-        <p class="text-muted mb-1">
-            Welcome, @User.Identity?.Name!
-        </p>
+    <!-- ================= HEADER ================= -->
 
-        @if (ViewBag.Student != null)
-        {
-            <small class="text-muted">
-                Enrollment: @ViewBag.Student.EnrollmentNo
-                |
-                Semester: @ViewBag.Student.Semester
-                |
-                Department: @ViewBag.Student.Department.Name
-            </small>
-        }
-    </div>
+    <div class="student-header">
 
-    <!-- Statistics -->
-    <div class="row g-4 mb-4">
+        <div>
+            <h1>
+                Welcome, @student.User.FullName 👋
+            </h1>
 
-        <div class="col-md-3">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body">
-                    <h6 class="text-muted">Attendance</h6>
-                    <h2 class="fw-bold">
-                        @ViewBag.AttendancePercentage%
-                    </h2>
-                    <small class="text-muted">Overall percentage</small>
-                </div>
-            </div>
+            <p>
+                Track your attendance and academic information
+                from one place.
+            </p>
         </div>
 
-        <div class="col-md-3">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body">
-                    <h6 class="text-muted">Present</h6>
-                    <h2 class="fw-bold text-success">
-                        @ViewBag.Present
-                    </h2>
-                    <small class="text-muted">Classes attended</small>
-                </div>
-            </div>
-        </div>
+        <div class="student-header-info">
 
-        <div class="col-md-3">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body">
-                    <h6 class="text-muted">Absent</h6>
-                    <h2 class="fw-bold text-danger">
-                        @ViewBag.Absent
-                    </h2>
-                    <small class="text-muted">Classes missed</small>
-                </div>
-            </div>
-        </div>
+            <span>
+                Semester @student.Semester
+            </span>
 
-        <div class="col-md-3">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body">
-                    <h6 class="text-muted">Late</h6>
-                    <h2 class="fw-bold text-warning">
-                        @ViewBag.Late
-                    </h2>
-                    <small class="text-muted">Late attendance</small>
-                </div>
-            </div>
+            <span>
+                @student.Department.Name
+            </span>
+
         </div>
 
     </div>
 
-    <!-- Attendance Section -->
-    <div class="card shadow-sm border-0 mb-4">
-        <div class="card-body">
 
-            <div class="d-flex justify-content-between align-items-center">
+    <!-- ================= STUDENT INFO ================= -->
 
-                <div>
-                    <h4 class="fw-bold mb-1">My Attendance</h4>
-                    <p class="text-muted mb-0">
-                        View your complete attendance records.
-                    </p>
+    <div class="student-info-card">
+
+        <div class="student-info-title">
+            👤 Student Information
+        </div>
+
+        <div class="row">
+
+            <div class="col-md-4">
+                <div class="student-info-item">
+                    <span>Name</span>
+                    <strong>
+                        @student.User.FullName
+                    </strong>
                 </div>
+            </div>
 
-                <a asp-controller="Student"
-                   asp-action="Attendance"
-                   class="btn btn-primary">
-                    View Attendance
-                </a>
+            <div class="col-md-4">
+                <div class="student-info-item">
+                    <span>Enrollment No.</span>
+                    <strong>
+                        @student.EnrollmentNo
+                    </strong>
+                </div>
+            </div>
 
+            <div class="col-md-4">
+                <div class="student-info-item">
+                    <span>Department</span>
+                    <strong>
+                        @student.Department.Name
+                    </strong>
+                </div>
             </div>
 
         </div>
+
     </div>
 
-    <!-- Quick Actions -->
-    <div class="card shadow-sm border-0">
-        <div class="card-body">
 
-            <h4 class="fw-bold mb-3">Quick Actions</h4>
+    <!-- ================= ATTENDANCE SUMMARY ================= -->
 
-            <div class="d-flex gap-2 flex-wrap">
+    <div class="section-heading">
 
-                <a asp-controller="Student"
-                   asp-action="Attendance"
-                   class="btn btn-outline-primary">
-                    📊 My Attendance
-                </a>
+        <div>
+            <h3>Attendance Summary</h3>
 
-                <a asp-controller="Home"
-                   asp-action="Index"
-                   class="btn btn-outline-secondary">
-                    🏠 Home
-                </a>
+            <p>
+                Your overall attendance statistics
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="row g-4 mb-5">
+
+        <!-- ATTENDANCE -->
+        <div class="col-md-6 col-lg-3">
+
+            <div class="student-stat-card">
+
+                <div class="student-stat-icon student-blue">
+                    📊
+                </div>
+
+                <span>Attendance</span>
+
+                <h2>
+                    @attendancePercentage%
+                </h2>
+
+                <small>
+                    Overall percentage
+                </small>
 
             </div>
 
         </div>
+
+
+        <!-- PRESENT -->
+        <div class="col-md-6 col-lg-3">
+
+            <div class="student-stat-card">
+
+                <div class="student-stat-icon student-green">
+                    ✅
+                </div>
+
+                <span>Present</span>
+
+                <h2>
+                    @ViewBag.Present
+                </h2>
+
+                <small>
+                    Classes attended
+                </small>
+
+            </div>
+
+        </div>
+
+
+        <!-- ABSENT -->
+        <div class="col-md-6 col-lg-3">
+
+            <div class="student-stat-card">
+
+                <div class="student-stat-icon student-red">
+                    ❌
+                </div>
+
+                <span>Absent</span>
+
+                <h2>
+                    @ViewBag.Absent
+                </h2>
+
+                <small>
+                    Classes missed
+                </small>
+
+            </div>
+
+        </div>
+
+
+        <!-- LATE -->
+        <div class="col-md-6 col-lg-3">
+
+            <div class="student-stat-card">
+
+                <div class="student-stat-icon student-yellow">
+                    ⏰
+                </div>
+
+                <span>Late</span>
+
+                <h2>
+                    @ViewBag.Late
+                </h2>
+
+                <small>
+                    Late attendance
+                </small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================= ATTENDANCE PROGRESS ================= -->
+
+    <div class="section-heading">
+
+        <div>
+            <h3>Attendance Progress</h3>
+
+            <p>
+                Your current attendance performance
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="attendance-progress-card">
+
+        <div class="attendance-progress-top">
+
+            <div>
+                <span>Overall Attendance</span>
+
+                <h2>
+                    @attendancePercentage%
+                </h2>
+            </div>
+
+            <div class="attendance-total">
+                Total Classes:
+                <strong>@ViewBag.TotalAttendance</strong>
+            </div>
+
+        </div>
+
+
+        <div class="progress attendance-progress">
+
+            <div class="progress-bar"
+                 role="progressbar"
+                 style="width: @attendancePercentage%;"
+                 aria-valuenow="@attendancePercentage"
+                 aria-valuemin="0"
+                 aria-valuemax="100">
+            </div>
+
+        </div>
+
+
+        <div class="attendance-progress-bottom">
+
+            <span>
+                ✅ Present: @ViewBag.Present
+            </span>
+
+            <span>
+                ❌ Absent: @ViewBag.Absent
+            </span>
+
+            <span>
+                ⏰ Late: @ViewBag.Late
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================= QUICK ACTION ================= -->
+
+    <div class="quick-action-section">
+
+        <a asp-controller="Student"
+           asp-action="Attendance"
+           class="student-action-button">
+
+            📋 View Full Attendance →
+
+        </a>
+
     </div>
 
 </div>
