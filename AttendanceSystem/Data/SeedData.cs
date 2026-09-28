@@ -4,10 +4,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AttendanceSystem.Data
 {
-    // Put this file in /Data/SeedData.cs
     public static class SeedData
     {
-        public static readonly string[] Roles = { "Admin", "Teacher", "Student" };
+        public static readonly string[] Roles =
+        {
+            "Admin",
+            "Teacher",
+            "Student"
+        };
 
         public static async Task InitializeAsync(IServiceProvider services)
         {
@@ -15,40 +19,108 @@ namespace AttendanceSystem.Data
             var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
             var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
 
-            // Applies pending migrations (creates the database on first run)
+            // Apply pending migrations
             await context.Database.MigrateAsync();
 
-            // 1. Roles
+            // =========================
+            // 1. Create Roles
+            // =========================
+
             foreach (var role in Roles)
             {
                 if (!await roleManager.RoleExistsAsync(role))
+                {
                     await roleManager.CreateAsync(new IdentityRole(role));
+                }
             }
 
-            // 2. Default admin
-            const string adminEmail = "admin@attendance.com";
-            const string adminPassword = "Admin@123";   // change after first login
+            // =========================
+            // 2. Create Admin
+            // =========================
 
-            if (await userManager.FindByEmailAsync(adminEmail) == null)
+            await CreateUser(
+                userManager,
+                "admin@attendance.com",
+                "Admin@123",
+                "System Admin",
+                "Admin"
+            );
+
+            // =========================
+            // 3. Create Teacher
+            // =========================
+
+            await CreateUser(
+                userManager,
+                "teacher@attendance.com",
+                "Teacher@123",
+                "Sample Teacher",
+                "Teacher"
+            );
+
+            // =========================
+            // 4. Create Student
+            // =========================
+
+            await CreateUser(
+                userManager,
+                "student@attendance.com",
+                "Student@123",
+                "Sample Student",
+                "Student"
+            );
+
+            // =========================
+            // 5. Sample Department
+            // =========================
+
+            if (!await context.Departments.AnyAsync())
             {
-                var admin = new ApplicationUser
+                context.Departments.Add(
+                    new Department
+                    {
+                        Name = "Computer Engineering"
+                    }
+                );
+
+                await context.SaveChangesAsync();
+            }
+        }
+
+        // Helper method to create users and assign roles
+        private static async Task CreateUser(
+            UserManager<ApplicationUser> userManager,
+            string email,
+            string password,
+            string fullName,
+            string role)
+        {
+            var user = await userManager.FindByEmailAsync(email);
+
+            if (user == null)
+            {
+                user = new ApplicationUser
                 {
-                    UserName = adminEmail,
-                    Email = adminEmail,
-                    FullName = "System Admin",
+                    UserName = email,
+                    Email = email,
+                    FullName = fullName,
                     EmailConfirmed = true
                 };
 
-                var result = await userManager.CreateAsync(admin, adminPassword);
-                if (result.Succeeded)
-                    await userManager.AddToRoleAsync(admin, "Admin");
+                var result = await userManager.CreateAsync(user, password);
+
+                if (!result.Succeeded)
+                {
+                    throw new Exception(
+                        $"Failed to create user {email}: " +
+                        string.Join(", ", result.Errors.Select(e => e.Description))
+                    );
+                }
             }
 
-            // 3. Sample department so the dropdowns are not empty
-            if (!await context.Departments.AnyAsync())
+            if (!await userManager.IsInRoleAsync(user, role))
             {
-                context.Departments.Add(new Department { Name = "Computer Engineering" });
-                await context.SaveChangesAsync();
+                await userManager.AddToRoleAsync(user, role);
             }
         }
     }
