@@ -85,6 +85,57 @@ namespace AttendanceSystem.Data
 
                 await context.SaveChangesAsync();
             }
+
+            // =========================================
+            // 6. STUDENT PROFILE - ADDED FOR DASHBOARD
+            // =========================================
+            // Creates the Student profile linked to the
+            // existing student login account.
+
+            var studentUser = await userManager.FindByEmailAsync(
+                "student@attendance.com"
+            );
+
+            var department = await context.Departments.FirstAsync();
+
+            if (studentUser != null &&
+                !await context.Students.AnyAsync(s => s.UserId == studentUser.Id))
+            {
+                context.Students.Add(
+                    new Student
+                    {
+                        UserId = studentUser.Id,
+                        EnrollmentNo = "CE001",
+                        Semester = 4,
+                        DepartmentId = department.Id
+                    }
+                );
+
+                await context.SaveChangesAsync();
+            }
+            // =========================================
+            // 7. TEACHER PROFILE - ADDED FOR DASHBOARD
+            // =========================================
+
+            var teacherUser = await userManager.FindByEmailAsync(
+                "teacher@attendance.com"
+            );
+
+            var teacherDepartment = await context.Departments.FirstAsync();
+
+            if (teacherUser != null &&
+                !await context.Teachers.AnyAsync(t => t.UserId == teacherUser.Id))
+            {
+                context.Teachers.Add(
+                    new Teacher
+                    {
+                        UserId = teacherUser.Id,
+                        DepartmentId = teacherDepartment.Id
+                    }
+                );
+
+                await context.SaveChangesAsync();
+            }
         }
 
         // Helper method to create users and assign roles

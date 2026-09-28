@@ -3,12 +3,126 @@
 }
 
 <div class="container mt-4">
-    <h2>Student Dashboard</h2>
 
-    <p>Welcome, @User.Identity?.Name!</p>
+    <!-- Header -->
+    <div class="mb-4">
+        <h1 class="fw-bold">Student Dashboard</h1>
+        <p class="text-muted mb-1">
+            Welcome, @User.Identity?.Name!
+        </p>
 
-    <hr />
+        @if (ViewBag.Student != null)
+        {
+            <small class="text-muted">
+                Enrollment: @ViewBag.Student.EnrollmentNo
+                |
+                Semester: @ViewBag.Student.Semester
+                |
+                Department: @ViewBag.Student.Department.Name
+            </small>
+        }
+    </div>
 
-    <h4>Attendance</h4>
-    <p>View your attendance records here.</p>
+    <!-- Statistics -->
+    <div class="row g-4 mb-4">
+
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <h6 class="text-muted">Attendance</h6>
+                    <h2 class="fw-bold">
+                        @ViewBag.AttendancePercentage%
+                    </h2>
+                    <small class="text-muted">Overall percentage</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <h6 class="text-muted">Present</h6>
+                    <h2 class="fw-bold text-success">
+                        @ViewBag.Present
+                    </h2>
+                    <small class="text-muted">Classes attended</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <h6 class="text-muted">Absent</h6>
+                    <h2 class="fw-bold text-danger">
+                        @ViewBag.Absent
+                    </h2>
+                    <small class="text-muted">Classes missed</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <h6 class="text-muted">Late</h6>
+                    <h2 class="fw-bold text-warning">
+                        @ViewBag.Late
+                    </h2>
+                    <small class="text-muted">Late attendance</small>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Attendance Section -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+
+            <div class="d-flex justify-content-between align-items-center">
+
+                <div>
+                    <h4 class="fw-bold mb-1">My Attendance</h4>
+                    <p class="text-muted mb-0">
+                        View your complete attendance records.
+                    </p>
+                </div>
+
+                <a asp-controller="Student"
+                   asp-action="Attendance"
+                   class="btn btn-primary">
+                    View Attendance
+                </a>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+
+            <h4 class="fw-bold mb-3">Quick Actions</h4>
+
+            <div class="d-flex gap-2 flex-wrap">
+
+                <a asp-controller="Student"
+                   asp-action="Attendance"
+                   class="btn btn-outline-primary">
+                    📊 My Attendance
+                </a>
+
+                <a asp-controller="Home"
+                   asp-action="Index"
+                   class="btn btn-outline-secondary">
+                    🏠 Home
+                </a>
+
+            </div>
+
+        </div>
+    </div>
+
 </div>
