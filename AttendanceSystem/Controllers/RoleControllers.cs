@@ -233,7 +233,7 @@ namespace AttendanceSystem.Controllers
             ViewBag.Late = late;
             ViewBag.AttendancePercentage = percentage;
 
-            return View();
+            return View(attendanceRecords);
         }
 
 
