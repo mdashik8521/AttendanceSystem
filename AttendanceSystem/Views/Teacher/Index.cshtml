@@ -1,14 +1,258 @@
 @{
     ViewData["Title"] = "Teacher Dashboard";
+
+    var teacher = ViewBag.Teacher;
+    var recentSessions = ViewBag.RecentSessions
+        as IEnumerable<AttendanceSystem.Models.ClassSession>;
 }
 
-<div class="container mt-4">
-    <h2>Teacher Dashboard</h2>
+<div class="container teacher-dashboard">
 
-    <p>Welcome, @User.Identity?.Name!</p>
+    <!-- ================= HEADER ================= -->
 
-    <hr />
+    <div class="teacher-header">
 
-    <h4>Teacher Panel</h4>
-    <p>Manage student attendance here.</p>
+        <div>
+            <h1>
+                Welcome, @teacher.User.FullName 👋
+            </h1>
+
+            <p>
+                Manage your subjects, classes and attendance
+                from one place.
+            </p>
+        </div>
+
+        <div class="teacher-year">
+            Academic Year 2026-2027
+        </div>
+
+    </div>
+
+
+    <!-- ================= QUICK STATS ================= -->
+
+    <div class="row g-4 mb-5">
+
+        <!-- SUBJECTS -->
+        <div class="col-md-4 col-lg-4">
+
+            <div class="teacher-stat-card">
+
+                <div class="teacher-stat-icon teacher-blue">
+                    📚
+                </div>
+
+                <div>
+                    <span>My Subjects</span>
+
+                    <h2>
+                        @ViewBag.TotalSubjects
+                    </h2>
+
+                    <small>
+                        Assigned subjects
+                    </small>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- SESSIONS -->
+        <div class="col-md-4 col-lg-4">
+
+            <div class="teacher-stat-card">
+
+                <div class="teacher-stat-icon teacher-purple">
+                    🗓️
+                </div>
+
+                <div>
+                    <span>Class Sessions</span>
+
+                    <h2>
+                        @ViewBag.TotalSessions
+                    </h2>
+
+                    <small>
+                        Total sessions
+                    </small>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ATTENDANCE -->
+        <div class="col-md-4 col-lg-4">
+
+            <div class="teacher-stat-card">
+
+                <div class="teacher-stat-icon teacher-green">
+                    📊
+                </div>
+
+                <div>
+                    <span>Attendance Records</span>
+
+                    <h2>
+                        @ViewBag.TotalAttendanceRecords
+                    </h2>
+
+                    <small>
+                        Attendance records
+                    </small>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================= MY SUBJECTS ================= -->
+
+    <div class="section-heading">
+
+        <div>
+            <h3>My Subjects</h3>
+
+            <p>
+                Subjects assigned to you
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="row g-4 mb-5">
+
+        @foreach (var subject in teacher.Subjects)
+        {
+            <div class="col-md-6 col-lg-4">
+
+                <div class="subject-card">
+
+                    <div class="subject-icon">
+                        📚
+                    </div>
+
+                    <div class="subject-content">
+
+                        <h4>
+                            @subject.Name
+                        </h4>
+
+                        <div class="subject-code">
+                            @subject.Code
+                        </div>
+
+                        <div class="subject-semester">
+                            Semester @subject.Semester
+                        </div>
+
+                    </div>
+
+                    <div class="subject-button">
+                        View Subject →
+                    </div>
+
+                </div>
+
+            </div>
+        }
+
+    </div>
+
+
+    <!-- ================= RECENT SESSIONS ================= -->
+
+    <div class="section-heading">
+
+        <div>
+            <h3>Recent Class Sessions</h3>
+
+            <p>
+                Your latest classroom sessions
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="recent-session-card">
+
+        @if (recentSessions != null && recentSessions.Any())
+        {
+            <div class="table-responsive">
+
+                <table class="table teacher-session-table mb-0">
+
+                    <thead>
+
+                        <tr>
+                            <th>Subject</th>
+                            <th>Date</th>
+                            <th>Start Time</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var session in recentSessions)
+                        {
+                            <tr>
+
+                                <td>
+                                    <strong>
+                                        @session.Subject?.Name
+                                    </strong>
+
+                                    <br />
+
+                                    <small>
+                                        @session.Subject?.Code
+                                    </small>
+                                </td>
+
+                                <td>
+                                    @session.Date.ToString("dd MMM yyyy")
+                                </td>
+
+                                <td>
+                                    @DateTime.Today.Add(session.StartTime)
+                                        .ToString("hh:mm tt")
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+        else
+        {
+            <div class="empty-sessions">
+                <div class="empty-icon">
+                    🗓️
+                </div>
+
+                <h5>No Class Sessions</h5>
+
+                <p>
+                    No class sessions have been created yet.
+                </p>
+            </div>
+        }
+
+    </div>
+
 </div>

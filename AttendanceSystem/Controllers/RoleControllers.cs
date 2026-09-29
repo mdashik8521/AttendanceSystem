@@ -7,6 +7,13 @@ namespace AttendanceSystem.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly AppDbContext _context;
+
+        public HomeController(AppDbContext context)
+        {
+            _context = context;
+        }
+
         public IActionResult Index()
         {
             if (User.Identity?.IsAuthenticated == true)
@@ -24,11 +31,46 @@ namespace AttendanceSystem.Controllers
             return View();
         }
 
+        // =========================
+        // ADMIN - TEACHERS LIST
+        // =========================
+
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Teachers()
+        {
+            var teachers = await _context.Teachers
+                .Include(t => t.User)
+                .Include(t => t.Department)
+                .ToListAsync();
+
+            return View(teachers);
+        }
+
+        // =========================
+        // ADMIN - STUDENTS LIST
+        // =========================
+
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Students()
+        {
+            var students = await _context.Students
+                .Include(s => s.User)
+                .Include(s => s.Department)
+                .ToListAsync();
+
+            return View(students);
+        }
+
         public IActionResult Error()
         {
             return View();
         }
     }
+
+
+    // =========================================================
+    // ADMIN CONTROLLER
+    // =========================================================
 
     [Authorize(Roles = "Admin")]
     public class AdminController : Controller
@@ -50,9 +92,29 @@ namespace AttendanceSystem.Controllers
             ViewBag.TotalAttendanceRecords =
                 await _context.AttendanceRecords.CountAsync();
 
+            ViewBag.AcademicYear = "2026-2027";
+
             return View();
         }
+
+        public async Task<IActionResult> Departments()
+        {
+            var departments = await _context.Departments
+                .Include(d => d.Students)
+                    .ThenInclude(s => s.User)
+                .Include(d => d.Teachers)
+                    .ThenInclude(t => t.User)
+                .OrderBy(d => d.Name)
+                .ToListAsync();
+
+            return View(departments);
+        }
     }
+
+
+    // =========================================================
+    // TEACHER CONTROLLER
+    // =========================================================
 
     [Authorize(Roles = "Teacher")]
     public class TeacherController : Controller
@@ -91,6 +153,7 @@ namespace AttendanceSystem.Controllers
                 .CountAsync(ar =>
                     subjectIds.Contains(ar.ClassSession!.SubjectId));
 
+            // SQLite TimeSpan ordering fix
             var recentSessions = (await _context.ClassSessions
                 .Include(cs => cs.Subject)
                 .Where(cs => subjectIds.Contains(cs.SubjectId))
@@ -110,6 +173,11 @@ namespace AttendanceSystem.Controllers
             return View();
         }
     }
+
+
+    // =========================================================
+    // STUDENT CONTROLLER
+    // =========================================================
 
     [Authorize(Roles = "Student")]
     public class StudentController : Controller
@@ -165,8 +233,13 @@ namespace AttendanceSystem.Controllers
             ViewBag.Late = late;
             ViewBag.AttendancePercentage = percentage;
 
-            return View();
+            return View(attendanceRecords);
         }
+
+
+        // =========================
+        // STUDENT ATTENDANCE
+        // =========================
 
         public async Task<IActionResult> Attendance()
         {
@@ -181,13 +254,16 @@ namespace AttendanceSystem.Controllers
                 return NotFound("Student profile not found.");
             }
 
-            var records = await _context.AttendanceRecords
+            // SQLite TimeSpan ordering fix
+            var records = (await _context.AttendanceRecords
                 .Include(a => a.ClassSession)
                     .ThenInclude(cs => cs!.Subject)
                 .Where(a => a.StudentId == student.Id)
                 .OrderByDescending(a => a.ClassSession!.Date)
+                .ToListAsync())
+                .OrderByDescending(a => a.ClassSession!.Date)
                 .ThenByDescending(a => a.ClassSession!.StartTime)
-                .ToListAsync();
+                .ToList();
 
             return View(records);
         }

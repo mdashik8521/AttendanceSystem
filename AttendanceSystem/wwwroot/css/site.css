@@ -1,31 +1,332 @@
-html {
-  font-size: 14px;
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+/* ================= THEME ================= */
+:root {
+    --primary: #6366f1;
+    --primary-dark: #4f46e5;
+    --secondary: #8b5cf6;
+    --dark: #0f172a;
+    --text: #334155;
+    --muted: #64748b;
+    --bg: #f1f5f9;
+    --card: #ffffff;
+    --border: #e2e8f0;
+    --radius: 14px;
+    --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    --shadow-lg: 0 20px 45px rgba(99, 102, 241, 0.22);
 }
 
+/* ================= BASE ================= */
+html {
+    font-size: 15px;
+    position: relative;
+    min-height: 100%;
+}
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
+    html { font-size: 16px; }
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 70px;
+    font-family: 'Poppins', 'Segoe UI', sans-serif;
+    color: var(--text);
+    background:
+        radial-gradient(circle at 10% 0%, rgba(99, 102, 241, 0.12), transparent 40%),
+        radial-gradient(circle at 90% 100%, rgba(139, 92, 246, 0.12), transparent 40%),
+        var(--bg);
+    background-attachment: fixed;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+h1, h2, h3, h4, h5 {
+    color: var(--dark);
+    font-weight: 700;
+    letter-spacing: -0.3px;
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+a {
+    color: var(--primary-dark);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+a:hover { color: var(--secondary); }
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus,
+.form-control:focus, .form-check-input:focus {
+    box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
+}
+
+/* ================= NAVBAR ================= */
+.navbar {
+    background: linear-gradient(135deg, #0f172a, #1e1b4b) !important;
+    border: none !important;
+    padding: 14px 0;
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.35);
+}
+.navbar .navbar-brand {
+    color: #fff !important;
+    font-weight: 700;
+    font-size: 1.35rem;
+    letter-spacing: 0.3px;
+}
+.navbar .nav-link {
+    color: #cbd5e1 !important;
+    font-weight: 500;
+    padding: 8px 16px !important;
+    margin: 0 2px;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+}
+.navbar .nav-link:hover {
+    color: #fff !important;
+    background: rgba(255, 255, 255, 0.1);
+}
+.navbar .nav-link.active {
+    color: #fff !important;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+}
+.navbar-toggler {
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.9);
+}
+
+/* ================= HOME / HERO ================= */
+.display-4 {
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-top: 40px;
+}
+.text-center p { color: var(--muted); font-size: 1.05rem; }
+
+/* ================= BUTTONS ================= */
+.btn {
+    border-radius: 10px;
+    font-weight: 600;
+    padding: 10px 22px;
+    transition: all 0.2s ease;
+}
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border: none;
+    color: #fff;
+}
+.btn-primary:hover, .btn-primary:focus {
+    background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+}
+.btn-success { border: none; }
+.btn-danger { border: none; }
+.btn-outline-primary {
+    color: var(--primary-dark);
+    border: 2px solid var(--primary);
+}
+.btn-outline-primary:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+}
+.btn-sm { padding: 6px 14px; }
+
+/* ================= CARDS ================= */
+.card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+.card-header {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: #fff;
+    font-weight: 600;
+    border-radius: var(--radius) var(--radius) 0 0 !important;
+    border: none;
+    padding: 14px 20px;
+}
+.card-body { padding: 22px; }
+
+/* ================= FORMS ================= */
+.form-control, .form-select {
+    border-radius: 10px;
+    padding: 11px 14px;
+    border: 1.5px solid var(--border);
+    background: #f8fafc;
+    transition: all 0.2s ease;
+}
+.form-control:focus, .form-select:focus {
+    background: #fff;
+    border-color: var(--primary);
+}
+.form-floating > label { color: var(--muted); }
+label, .form-label {
+    font-weight: 500;
+    color: var(--dark);
+}
+.text-danger, .field-validation-error {
+    font-size: 0.85rem;
+}
+
+/* ================= LOGIN / REGISTER BOX ================= */
+#account,
+.login-box {
+    background: var(--card);
+    padding: 36px 32px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    overflow: hidden;
+}
+#account::before,
+.login-box::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+}
+#account h2, #account h3 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+#account .btn-primary,
+#account button[type="submit"] {
+    width: 100%;
+    padding: 13px;
+    font-size: 1.02rem;
+}
+#account .checkbox, #account .form-check {
+    margin: 10px 0;
+    color: var(--muted);
+}
+
+/* Links below login form (Forgot password / Register / Resend) */
+#account ~ *, section + section { }
+.col-md-4 p { margin: 0; }
+.col-md-4 p a {
+    display: block;
+    margin-top: 10px;
+    padding: 11px 16px;
+    background: #fff;
+    color: var(--primary-dark);
+    font-weight: 500;
+    text-align: center;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    transition: all 0.2s ease;
+}
+.col-md-4 p a:hover {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: #fff;
+    border-color: transparent;
+    transform: translateY(-2px);
+}
+
+/* ================= TABLES ================= */
+.table {
+    background: var(--card);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 16px;
+}
+.table thead th {
+    background: linear-gradient(135deg, #0f172a, #1e1b4b);
+    color: #fff;
+    font-weight: 600;
+    border: none;
+    padding: 14px 16px;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.6px;
+}
+.table td {
+    padding: 13px 16px;
+    vertical-align: middle;
+    border-top: 1px solid var(--border);
+}
+.table tbody tr { transition: background 0.15s ease; }
+.table tbody tr:hover { background: #eef2ff; }
+
+/* ================= ALERTS & BADGES ================= */
+.alert {
+    border: none;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+}
+.badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+/* ================= FOOTER ================= */
+.footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    line-height: 60px;
+    background: #fff;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    text-align: center;
+}
+.footer a { font-weight: 500; }
+
+/* ================= EXTRAS ================= */
+::selection { background: var(--primary); color: #fff; }
+
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(var(--primary), var(--secondary));
+    border-radius: 10px;
+}
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+main { animation: fadeUp 0.5s ease; }
+
+
+/* ===== Login links: har link ek rectangle box me ===== */
+#account p {
+    margin: 0 !important;
+}
+
+#account p a,
+#account a[id="forgot-password"],
+#account a[id="register"],
+#account a[id="resend-confirmation"] {
+    display: block !important;
+    margin-top: 12px;
+    padding: 12px 16px;
+    background: #f8fafc;
+    color: var(--primary-dark) !important;
+    font-weight: 500;
+    text-align: center;
+    text-decoration: none !important;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    transition: all 0.2s ease;
+}
+
+#account p a:hover,
+#account a[id="forgot-password"]:hover,
+#account a[id="register"]:hover,
+#account a[id="resend-confirmation"]:hover {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: #fff !important;
+    border-color: transparent;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.3);
 }

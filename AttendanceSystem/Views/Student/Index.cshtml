@@ -1,128 +1,96 @@
+@model AttendanceSystem.Models.StudentDashboardViewModel
+
 @{
     ViewData["Title"] = "Student Dashboard";
 }
 
 <div class="container mt-4">
-
-    <!-- Header -->
-    <div class="mb-4">
-        <h1 class="fw-bold">Student Dashboard</h1>
-        <p class="text-muted mb-1">
-            Welcome, @User.Identity?.Name!
-        </p>
-
-        @if (ViewBag.Student != null)
-        {
-            <small class="text-muted">
-                Enrollment: @ViewBag.Student.EnrollmentNo
-                |
-                Semester: @ViewBag.Student.Semester
-                |
-                Department: @ViewBag.Student.Department.Name
-            </small>
-        }
-    </div>
-
-    <!-- Statistics -->
-    <div class="row g-4 mb-4">
-
-        <div class="col-md-3">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body">
-                    <h6 class="text-muted">Attendance</h6>
-                    <h2 class="fw-bold">
-                        @ViewBag.AttendancePercentage%
-                    </h2>
-                    <small class="text-muted">Overall percentage</small>
-                </div>
+    <!-- Welcome Banner & Student Details -->
+    <div class="card bg-primary text-white mb-4 shadow-sm">
+        <div class="card-body p-4 d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="fw-bold mb-1">Welcome back, @Model.StudentName!</h2>
+                <p class="mb-0"><strong>Roll No:</strong> @Model.RollNumber | <strong>Dept:</strong> @Model.Department</p>
             </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body">
-                    <h6 class="text-muted">Present</h6>
-                    <h2 class="fw-bold text-success">
-                        @ViewBag.Present
-                    </h2>
-                    <small class="text-muted">Classes attended</small>
-                </div>
+            <div>
+                <a asp-action="Attendance" class="btn btn-light text-primary fw-semibold">View Full History</a>
             </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body">
-                    <h6 class="text-muted">Absent</h6>
-                    <h2 class="fw-bold text-danger">
-                        @ViewBag.Absent
-                    </h2>
-                    <small class="text-muted">Classes missed</small>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body">
-                    <h6 class="text-muted">Late</h6>
-                    <h2 class="fw-bold text-warning">
-                        @ViewBag.Late
-                    </h2>
-                    <small class="text-muted">Late attendance</small>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- Attendance Section -->
-    <div class="card shadow-sm border-0 mb-4">
-        <div class="card-body">
-
-            <div class="d-flex justify-content-between align-items-center">
-
-                <div>
-                    <h4 class="fw-bold mb-1">My Attendance</h4>
-                    <p class="text-muted mb-0">
-                        View your complete attendance records.
-                    </p>
-                </div>
-
-                <a asp-controller="Student"
-                   asp-action="Attendance"
-                   class="btn btn-primary">
-                    View Attendance
-                </a>
-
-            </div>
-
         </div>
     </div>
 
-    <!-- Quick Actions -->
+    <!-- Attendance Quick Stats Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm text-center p-3">
+                <h6 class="text-muted">Overall Attendance</h6>
+                <h2 class="fw-bold text-@(Model.OverallAttendancePercentage >= 75 ? "success" : "danger")">
+                    @Model.OverallAttendancePercentage.ToString("F1")%
+                </h2>
+                <small class="text-muted">Target: 75% minimum required</small>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm text-center p-3">
+                <h6 class="text-muted">Classes Attended</h6>
+                <h2 class="fw-bold text-primary">@Model.TotalAttended / @Model.TotalClassesHeld</h2>
+                <small class="text-muted">Total lectures conducted</small>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm text-center p-3">
+                <h6 class="text-muted">Status Alert</h6>
+                @if (Model.OverallAttendancePercentage >= 75)
+                {
+                    <h5 class="text-success fw-bold mt-2">✓ Safe Zone</h5>
+                    <small class="text-muted">You are maintaining required threshold</small>
+                }
+                else
+                {
+                    <h5 class="text-danger fw-bold mt-2">⚠ Low Attendance</h5>
+                    <small class="text-muted">Need to attend upcoming classes</small>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Subject-wise Breakdown -->
     <div class="card shadow-sm border-0">
+        <div class="card-header bg-white py-3">
+            <h5 class="mb-0 fw-bold">Subject-wise Attendance</h5>
+        </div>
         <div class="card-body">
-
-            <h4 class="fw-bold mb-3">Quick Actions</h4>
-
-            <div class="d-flex gap-2 flex-wrap">
-
-                <a asp-controller="Student"
-                   asp-action="Attendance"
-                   class="btn btn-outline-primary">
-                    📊 My Attendance
-                </a>
-
-                <a asp-controller="Home"
-                   asp-action="Index"
-                   class="btn btn-outline-secondary">
-                    🏠 Home
-                </a>
-
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Subject</th>
+                            <th>Classes Conducted</th>
+                            <th>Attended</th>
+                            <th>Percentage</th>
+                            <th>Progress</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var sub in Model.SubjectSummaries)
+                        {
+                            var badgeClass = sub.Percentage >= 75 ? "bg-success" : "bg-danger";
+                            <tr>
+                                <td class="fw-semibold">@sub.SubjectName</td>
+                                <td>@sub.TotalClasses</td>
+                                <td>@sub.AttendedClasses</td>
+                                <td>
+                                    <span class="badge @badgeClass fs-6">@sub.Percentage.ToString("F1")%</span>
+                                </td>
+                                <td style="width: 200px;">
+                                    <div class="progress" style="height: 10px;">
+                                        <div class="progress-bar @badgeClass" role="progressbar" style="width: @sub.Percentage%"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             </div>
-
         </div>
     </div>
-
 </div>
