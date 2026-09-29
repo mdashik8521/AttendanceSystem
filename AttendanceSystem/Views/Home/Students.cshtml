@@ -1,0 +1,60 @@
+@using AttendanceSystem.Models
+@model List<Student>
+
+@{
+    ViewData["Title"] = "Students";
+}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold">All Students</h2>
+            <p class="text-muted">Student details</p>
+        </div>
+
+        <a asp-controller="Admin"
+           asp-action="Index"
+           class="btn btn-outline-secondary">
+            ← Dashboard
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+
+                    <thead>
+                        <tr>
+                            <th>Student ID</th>
+                            <th>Student Name</th>
+                            <th>Email</th>
+                            <th>Enrollment No</th>
+                            <th>Semester</th>
+                            <th>Department</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                    @foreach (var student in Model)
+                    {
+                        <tr>
+                            <td>@student.Id</td>
+                            <td>@student.User?.FullName</td>
+                            <td>@student.User?.Email</td>
+                            <td>@student.EnrollmentNo</td>
+                            <td>@student.Semester</td>
+                            <td>@student.Department?.Name</td>
+                        </tr>
+                    }
+                    </tbody>
+
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+</div>
