@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace AttendanceSystem.Controllers
 {
     public class HomeController : Controller
@@ -109,7 +110,18 @@ namespace AttendanceSystem.Controllers
 
             return View(departments);
         }
+                public async Task<IActionResult> Subjects()
+        {
+            var subjects = await _context.Subjects
+                .OrderBy(s => s.Name)
+                .ToListAsync();
+
+            return View(subjects);
+        }
+
+        
     }
+    
 
 
     // =========================================================
