@@ -1,278 +1,96 @@
+@model AttendanceSystem.Models.StudentDashboardViewModel
+
 @{
     ViewData["Title"] = "Student Dashboard";
-
-    var student = ViewBag.Student;
-    var attendancePercentage = ViewBag.AttendancePercentage ?? 0;
 }
 
-<div class="container student-dashboard">
-
-    <!-- ================= HEADER ================= -->
-
-    <div class="student-header">
-
-        <div>
-            <h1>
-                Welcome, @student.User.FullName 👋
-            </h1>
-
-            <p>
-                Track your attendance and academic information
-                from one place.
-            </p>
-        </div>
-
-        <div class="student-header-info">
-
-            <span>
-                Semester @student.Semester
-            </span>
-
-            <span>
-                @student.Department.Name
-            </span>
-
-        </div>
-
-    </div>
-
-
-    <!-- ================= STUDENT INFO ================= -->
-
-    <div class="student-info-card">
-
-        <div class="student-info-title">
-            👤 Student Information
-        </div>
-
-        <div class="row">
-
-            <div class="col-md-4">
-                <div class="student-info-item">
-                    <span>Name</span>
-                    <strong>
-                        @student.User.FullName
-                    </strong>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="student-info-item">
-                    <span>Enrollment No.</span>
-                    <strong>
-                        @student.EnrollmentNo
-                    </strong>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="student-info-item">
-                    <span>Department</span>
-                    <strong>
-                        @student.Department.Name
-                    </strong>
-                </div>
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- ================= ATTENDANCE SUMMARY ================= -->
-
-    <div class="section-heading">
-
-        <div>
-            <h3>Attendance Summary</h3>
-
-            <p>
-                Your overall attendance statistics
-            </p>
-        </div>
-
-    </div>
-
-
-    <div class="row g-4 mb-5">
-
-        <!-- ATTENDANCE -->
-        <div class="col-md-6 col-lg-3">
-
-            <div class="student-stat-card">
-
-                <div class="student-stat-icon student-blue">
-                    📊
-                </div>
-
-                <span>Attendance</span>
-
-                <h2>
-                    @attendancePercentage%
-                </h2>
-
-                <small>
-                    Overall percentage
-                </small>
-
-            </div>
-
-        </div>
-
-
-        <!-- PRESENT -->
-        <div class="col-md-6 col-lg-3">
-
-            <div class="student-stat-card">
-
-                <div class="student-stat-icon student-green">
-                    ✅
-                </div>
-
-                <span>Present</span>
-
-                <h2>
-                    @ViewBag.Present
-                </h2>
-
-                <small>
-                    Classes attended
-                </small>
-
-            </div>
-
-        </div>
-
-
-        <!-- ABSENT -->
-        <div class="col-md-6 col-lg-3">
-
-            <div class="student-stat-card">
-
-                <div class="student-stat-icon student-red">
-                    ❌
-                </div>
-
-                <span>Absent</span>
-
-                <h2>
-                    @ViewBag.Absent
-                </h2>
-
-                <small>
-                    Classes missed
-                </small>
-
-            </div>
-
-        </div>
-
-
-        <!-- LATE -->
-        <div class="col-md-6 col-lg-3">
-
-            <div class="student-stat-card">
-
-                <div class="student-stat-icon student-yellow">
-                    ⏰
-                </div>
-
-                <span>Late</span>
-
-                <h2>
-                    @ViewBag.Late
-                </h2>
-
-                <small>
-                    Late attendance
-                </small>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- ================= ATTENDANCE PROGRESS ================= -->
-
-    <div class="section-heading">
-
-        <div>
-            <h3>Attendance Progress</h3>
-
-            <p>
-                Your current attendance performance
-            </p>
-        </div>
-
-    </div>
-
-
-    <div class="attendance-progress-card">
-
-        <div class="attendance-progress-top">
-
+<div class="container mt-4">
+    <!-- Welcome Banner & Student Details -->
+    <div class="card bg-primary text-white mb-4 shadow-sm">
+        <div class="card-body p-4 d-flex justify-content-between align-items-center">
             <div>
-                <span>Overall Attendance</span>
+                <h2 class="fw-bold mb-1">Welcome back, @Model.StudentName!</h2>
+                <p class="mb-0"><strong>Roll No:</strong> @Model.RollNumber | <strong>Dept:</strong> @Model.Department</p>
+            </div>
+            <div>
+                <a asp-action="Attendance" class="btn btn-light text-primary fw-semibold">View Full History</a>
+            </div>
+        </div>
+    </div>
 
-                <h2>
-                    @attendancePercentage%
+    <!-- Attendance Quick Stats Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm text-center p-3">
+                <h6 class="text-muted">Overall Attendance</h6>
+                <h2 class="fw-bold text-@(Model.OverallAttendancePercentage >= 75 ? "success" : "danger")">
+                    @Model.OverallAttendancePercentage.ToString("F1")%
                 </h2>
+                <small class="text-muted">Target: 75% minimum required</small>
             </div>
-
-            <div class="attendance-total">
-                Total Classes:
-                <strong>@ViewBag.TotalAttendance</strong>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm text-center p-3">
+                <h6 class="text-muted">Classes Attended</h6>
+                <h2 class="fw-bold text-primary">@Model.TotalAttended / @Model.TotalClassesHeld</h2>
+                <small class="text-muted">Total lectures conducted</small>
             </div>
-
         </div>
-
-
-        <div class="progress attendance-progress">
-
-            <div class="progress-bar"
-                 role="progressbar"
-                 style="width: @attendancePercentage%;"
-                 aria-valuenow="@attendancePercentage"
-                 aria-valuemin="0"
-                 aria-valuemax="100">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm text-center p-3">
+                <h6 class="text-muted">Status Alert</h6>
+                @if (Model.OverallAttendancePercentage >= 75)
+                {
+                    <h5 class="text-success fw-bold mt-2">✓ Safe Zone</h5>
+                    <small class="text-muted">You are maintaining required threshold</small>
+                }
+                else
+                {
+                    <h5 class="text-danger fw-bold mt-2">⚠ Low Attendance</h5>
+                    <small class="text-muted">Need to attend upcoming classes</small>
+                }
             </div>
-
         </div>
-
-
-        <div class="attendance-progress-bottom">
-
-            <span>
-                ✅ Present: @ViewBag.Present
-            </span>
-
-            <span>
-                ❌ Absent: @ViewBag.Absent
-            </span>
-
-            <span>
-                ⏰ Late: @ViewBag.Late
-            </span>
-
-        </div>
-
     </div>
 
-
-    <!-- ================= QUICK ACTION ================= -->
-
-    <div class="quick-action-section">
-
-        <a asp-controller="Student"
-           asp-action="Attendance"
-           class="student-action-button">
-
-            📋 View Full Attendance →
-
-        </a>
-
+    <!-- Subject-wise Breakdown -->
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white py-3">
+            <h5 class="mb-0 fw-bold">Subject-wise Attendance</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Subject</th>
+                            <th>Classes Conducted</th>
+                            <th>Attended</th>
+                            <th>Percentage</th>
+                            <th>Progress</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var sub in Model.SubjectSummaries)
+                        {
+                            var badgeClass = sub.Percentage >= 75 ? "bg-success" : "bg-danger";
+                            <tr>
+                                <td class="fw-semibold">@sub.SubjectName</td>
+                                <td>@sub.TotalClasses</td>
+                                <td>@sub.AttendedClasses</td>
+                                <td>
+                                    <span class="badge @badgeClass fs-6">@sub.Percentage.ToString("F1")%</span>
+                                </td>
+                                <td style="width: 200px;">
+                                    <div class="progress" style="height: 10px;">
+                                        <div class="progress-bar @badgeClass" role="progressbar" style="width: @sub.Percentage%"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-
 </div>

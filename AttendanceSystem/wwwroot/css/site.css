@@ -1101,3 +1101,20 @@ body {
     }
 
 }
+
+#account p a {
+    display: block;
+    width: 100%;
+    max-width: 260px;   /* box ki width, chhota/bada kar sakte ho */
+    margin-top: 12px;
+    padding: 8px 14px;  /* height kam */
+    background: #ffffff;
+    color: #4f46e5;
+    text-align: left;   /* text left me */
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    border: 1.5px solid #c7d2fe;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}

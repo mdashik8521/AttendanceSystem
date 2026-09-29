@@ -30,6 +30,7 @@
         <!-- STUDENTS -->
         <div class="col-md-4">
 
+
             <a asp-controller="Home"
                asp-action="Students"
                class="dashboard-link">
@@ -124,29 +125,36 @@
 
 
         <!-- SUBJECTS -->
-        <div class="col-md-4">
+     <!-- SUBJECTS -->
+<div class="col-md-4">
 
-            <div class="card dashboard-card shadow-sm">
+    <a asp-controller="Admin"
+       asp-action="Subjects"
+       class="dashboard-link">
 
-                <div class="card-body">
+        <div class="card dashboard-card shadow-sm">
 
-                    <div class="dashboard-icon icon-subjects">
-                        📚
-                    </div>
+            <div class="card-body">
 
-                    <h5>Total Subjects</h5>
+                <div class="dashboard-icon icon-subjects">
+                    📚
+                </div>
 
-                    <h2>@ViewBag.TotalSubjects</h2>
+                <h5>Total Subjects</h5>
 
-                    <small>
-                        Subjects currently available
-                    </small>
+                <h2>@ViewBag.TotalSubjects</h2>
 
+                <div class="dashboard-view-button">
+                    View Subjects →
                 </div>
 
             </div>
 
         </div>
+
+    </a>
+
+</div>
 
 
         <!-- CLASS SESSIONS -->
