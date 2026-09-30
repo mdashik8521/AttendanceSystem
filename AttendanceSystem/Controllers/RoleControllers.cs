@@ -1,7 +1,9 @@
 using AttendanceSystem.Data;
+using AttendanceSystem.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+
 
 
 namespace AttendanceSystem.Controllers
@@ -110,15 +112,120 @@ namespace AttendanceSystem.Controllers
 
             return View(departments);
         }
-                public async Task<IActionResult> Subjects()
-        {
-            var subjects = await _context.Subjects
-                .OrderBy(s => s.Name)
-                .ToListAsync();
+        public async Task<IActionResult> Subjects()
+{
+    var subjects = await _context.Subjects
+        .Include(s => s.Teacher)
+            .ThenInclude(t => t!.Department)
+        .OrderBy(s => s.Name)
+        .ToListAsync();
 
-            return View(subjects);
-        }
+    ViewBag.Departments = await _context.Departments
+        .OrderBy(d => d.Name)
+        .ToListAsync();
 
+    ViewBag.Teachers = await _context.Teachers
+        .Include(t => t.User)
+        .Include(t => t.Department)
+        .OrderBy(t => t.User!.FullName)
+        .ToListAsync();
+
+    return View(subjects);
+}
+
+
+
+// 👇 YAHAN AddSubject paste karo
+
+[HttpPost]
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> AddSubject(
+    string name,
+    string code,
+    int semester,
+    int teacherId)
+{
+    if (await _context.Subjects.CountAsync() >= 6)
+    {
+        TempData["Error"] = "Maximum 6 subjects are allowed.";
+        return RedirectToAction(nameof(Subjects));
+    }
+
+    if (string.IsNullOrWhiteSpace(name))
+    {
+        TempData["Error"] = "Subject name is required.";
+        return RedirectToAction(nameof(Subjects));
+    }
+
+    if (string.IsNullOrWhiteSpace(code))
+    {
+        TempData["Error"] = "Subject code is required.";
+        return RedirectToAction(nameof(Subjects));
+    }
+
+    if (await _context.Subjects.AnyAsync(s => s.Code == code))
+    {
+        TempData["Error"] = "A subject with this code already exists.";
+        return RedirectToAction(nameof(Subjects));
+    }
+
+    var teacher = await _context.Teachers
+        .FirstOrDefaultAsync(t => t.Id == teacherId);
+
+    if (teacher == null)
+    {
+        TempData["Error"] = "Please select a valid teacher.";
+        return RedirectToAction(nameof(Subjects));
+    }
+
+    var subject = new Subject
+    {
+        Name = name.Trim(),
+        Code = code.Trim(),
+        Semester = semester,
+        TeacherId = teacherId
+    };
+
+    _context.Subjects.Add(subject);
+    await _context.SaveChangesAsync();
+
+    TempData["Success"] = "Subject added successfully.";
+
+    return RedirectToAction(nameof(Subjects));
+}
+
+[HttpPost]
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> DeleteSubject(int id)
+{
+    var subject = await _context.Subjects
+        .Include(s => s.Sessions)
+        .FirstOrDefaultAsync(s => s.Id == id);
+
+    if (subject == null)
+    {
+        TempData["Error"] = "Subject not found.";
+        return RedirectToAction(nameof(Subjects));
+    }
+
+    if (subject.Sessions.Any())
+    {
+        TempData["Error"] =
+            "This subject cannot be deleted because it has linked class sessions.";
+
+        return RedirectToAction(nameof(Subjects));
+    }
+
+    _context.Subjects.Remove(subject);
+
+    await _context.SaveChangesAsync();
+
+    TempData["Success"] = "Subject deleted successfully.";
+
+    return RedirectToAction(nameof(Subjects));
+}
+
+}
         
     }
     
@@ -280,4 +387,3 @@ namespace AttendanceSystem.Controllers
             return View(records);
         }
     }
-}
