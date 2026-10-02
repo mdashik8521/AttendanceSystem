@@ -6,106 +6,362 @@
         as IEnumerable<AttendanceSystem.Models.ClassSession>;
 }
 
+<style>
+    .teacher-dashboard {
+        padding: 30px 0;
+    }
+
+    .welcome-card {
+        background: linear-gradient(135deg, #1e3a8a, #2563eb);
+        color: white;
+        border-radius: 20px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+    }
+
+    .welcome-card h1 {
+        font-size: 30px;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .welcome-card p {
+        margin-bottom: 5px;
+        opacity: 0.9;
+    }
+
+    .teacher-info {
+        margin-top: 20px;
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .info-badge {
+        background: rgba(255,255,255,0.15);
+        padding: 8px 15px;
+        border-radius: 20px;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 18px;
+        padding: 24px;
+        height: 100%;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.06);
+        transition: 0.2s;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    .stat-icon {
+        font-size: 30px;
+        margin-bottom: 12px;
+    }
+
+    .stat-title {
+        color: #6b7280;
+        font-size: 14px;
+    }
+
+    .stat-number {
+        font-size: 30px;
+        font-weight: 700;
+        margin: 5px 0;
+    }
+
+    .section-title {
+        margin: 35px 0 20px;
+    }
+
+    .section-title h3 {
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+
+    .section-title p {
+        color: #6b7280;
+        margin: 0;
+    }
+
+    .action-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 20px;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+        transition: 0.2s;
+    }
+
+    .action-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        color: inherit;
+    }
+
+    .action-icon {
+        font-size: 28px;
+        margin-bottom: 10px;
+    }
+
+    .action-card h5 {
+        margin-bottom: 5px;
+        font-weight: 700;
+    }
+
+    .action-card p {
+        margin: 0;
+        color: #6b7280;
+        font-size: 14px;
+    }
+
+    .subject-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 18px;
+        padding: 22px;
+        height: 100%;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        transition: 0.2s;
+    }
+
+    .subject-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    .subject-icon {
+        font-size: 32px;
+        margin-bottom: 12px;
+    }
+
+    .subject-card h4 {
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .subject-code {
+        display: inline-block;
+        background: #eff6ff;
+        color: #2563eb;
+        padding: 5px 10px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .subject-semester {
+        color: #6b7280;
+        margin-top: 10px;
+        font-size: 14px;
+    }
+
+    .session-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+
+    .session-table {
+        margin: 0;
+    }
+
+    .session-table th {
+        background: #f8fafc;
+        color: #374151;
+        font-size: 14px;
+    }
+
+    .session-table td {
+        vertical-align: middle;
+    }
+
+    .empty-state {
+        padding: 50px 20px;
+        text-align: center;
+        color: #6b7280;
+    }
+
+    .empty-state-icon {
+        font-size: 45px;
+        margin-bottom: 10px;
+    }
+</style>
+
+
 <div class="container teacher-dashboard">
 
-    <!-- ================= HEADER ================= -->
+    <!-- WELCOME -->
 
-    <div class="teacher-header">
+    <div class="welcome-card">
 
-        <div>
-            <h1>
-                Welcome, @teacher.User.FullName 👋
-            </h1>
+        <h1>
+            Welcome, @teacher.User.FullName 👋
+        </h1>
 
-            <p>
-                Manage your subjects, classes and attendance
-                from one place.
-            </p>
-        </div>
+        <p>
+            Manage your subjects, classes and attendance from one place.
+        </p>
 
-        <div class="teacher-year">
-            Academic Year 2026-2027
+        <div class="teacher-info">
+
+            <div class="info-badge">
+                🏫 Department: @teacher.Department?.Name
+            </div>
+
+            <div class="info-badge">
+                📚 Subjects: @ViewBag.TotalSubjects
+            </div>
+
+            <div class="info-badge">
+                📅 Academic Year: 2026-2027
+            </div>
+
         </div>
 
     </div>
 
 
-    <!-- ================= QUICK STATS ================= -->
+    <!-- STATISTICS -->
 
-    <div class="row g-4 mb-5">
+    <div class="row g-4">
 
-        <!-- SUBJECTS -->
-        <div class="col-md-4 col-lg-4">
+        <div class="col-md-4">
 
-            <div class="teacher-stat-card">
+            <div class="stat-card">
 
-                <div class="teacher-stat-icon teacher-blue">
+                <div class="stat-icon">
                     📚
                 </div>
 
-                <div>
-                    <span>My Subjects</span>
-
-                    <h2>
-                        @ViewBag.TotalSubjects
-                    </h2>
-
-                    <small>
-                        Assigned subjects
-                    </small>
+                <div class="stat-title">
+                    My Subjects
                 </div>
+
+                <div class="stat-number">
+                    @ViewBag.TotalSubjects
+                </div>
+
+                <small class="text-muted">
+                    Assigned subjects
+                </small>
 
             </div>
 
         </div>
 
 
-        <!-- SESSIONS -->
-        <div class="col-md-4 col-lg-4">
+        <div class="col-md-4">
 
-            <div class="teacher-stat-card">
+            <div class="stat-card">
 
-                <div class="teacher-stat-icon teacher-purple">
+                <div class="stat-icon">
                     🗓️
                 </div>
 
-                <div>
-                    <span>Class Sessions</span>
-
-                    <h2>
-                        @ViewBag.TotalSessions
-                    </h2>
-
-                    <small>
-                        Total sessions
-                    </small>
+                <div class="stat-title">
+                    Class Sessions
                 </div>
+
+                <div class="stat-number">
+                    @ViewBag.TotalSessions
+                </div>
+
+                <small class="text-muted">
+                    Total sessions conducted
+                </small>
 
             </div>
 
         </div>
 
 
-        <!-- ATTENDANCE -->
-        <div class="col-md-4 col-lg-4">
+        <div class="col-md-4">
 
-            <div class="teacher-stat-card">
+            <div class="stat-card">
 
-                <div class="teacher-stat-icon teacher-green">
+                <div class="stat-icon">
                     📊
                 </div>
 
-                <div>
-                    <span>Attendance Records</span>
-
-                    <h2>
-                        @ViewBag.TotalAttendanceRecords
-                    </h2>
-
-                    <small>
-                        Attendance records
-                    </small>
+                <div class="stat-title">
+                    Attendance Records
                 </div>
+
+                <div class="stat-number">
+                    @ViewBag.TotalAttendanceRecords
+                </div>
+
+                <small class="text-muted">
+                    Attendance entries
+                </small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+<!-- QUICK ACTIONS -->
+
+<div class="section-title">
+
+    <h3>Quick Actions</h3>
+
+    <p>
+        Quickly access your teaching activities.
+    </p>
+
+</div>
+
+<div class="row g-4">
+
+    <!-- TAKE ATTENDANCE -->
+
+    <div class="col-md-4">
+
+        <div class="action-card">
+
+            <div class="action-icon">
+                📊
+            </div>
+
+            <h5>Take Attendance</h5>
+
+            <p>
+                Select a subject and start attendance.
+            </p>
+
+            <div class="mt-3">
+
+                @foreach (var subject in teacher.Subjects)
+                {
+                    <form asp-controller="Teacher"
+                          asp-action="StartSession"
+                          method="post">
+
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden"
+                               name="subjectId"
+                               value="@subject.Id" />
+
+                        <button type="submit"
+                                class="btn btn-primary w-100 mb-2">
+                            ▶ Start @subject.Name
+                        </button>
+
+                    </form>
+                }
 
             </div>
 
@@ -114,34 +370,81 @@
     </div>
 
 
-    <!-- ================= MY SUBJECTS ================= -->
+    <!-- CLASS SESSIONS -->
 
-    <div class="section-heading">
+    <div class="col-md-4">
 
-        <div>
-            <h3>My Subjects</h3>
+        <a href="#" class="action-card">
+
+            <div class="action-icon">
+                🗓️
+            </div>
+
+            <h5>Class Sessions</h5>
 
             <p>
-                Subjects assigned to you
+                Manage your class sessions.
             </p>
-        </div>
+
+        </a>
 
     </div>
 
 
-    <div class="row g-4 mb-5">
+    <!-- MY SUBJECTS -->
 
-        @foreach (var subject in teacher.Subjects)
+    <div class="col-md-4">
+
+        <a asp-controller="Teacher"
+           asp-action="Index"
+           class="action-card">
+
+            <div class="action-icon">
+                📚
+            </div>
+
+            <h5>My Subjects</h5>
+
+            <p>
+                View your assigned subjects.
+            </p>
+
+        </a>
+
+    </div>
+
+</div>
+
+
+
+
+
+    <!-- MY SUBJECTS -->
+
+    <div class="section-title">
+
+        <h3>My Subjects</h3>
+
+        <p>
+            Subjects currently assigned to you.
+        </p>
+
+    </div>
+
+
+    <div class="row g-4">
+
+        @if (teacher.Subjects != null && teacher.Subjects.Count > 0)
         {
-            <div class="col-md-6 col-lg-4">
+            foreach (var subject in teacher.Subjects)
+            {
+                <div class="col-md-6 col-lg-4">
 
-                <div class="subject-card">
+                    <div class="subject-card">
 
-                    <div class="subject-icon">
-                        📚
-                    </div>
-
-                    <div class="subject-content">
+                        <div class="subject-icon">
+                            📚
+                        </div>
 
                         <h4>
                             @subject.Name
@@ -157,9 +460,24 @@
 
                     </div>
 
-                    <div class="subject-button">
-                        View Subject →
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12">
+
+                <div class="empty-state">
+
+                    <div class="empty-state-icon">
+                        📚
                     </div>
+
+                    <h5>No Subjects Assigned</h5>
+
+                    <p>
+                        No subjects have been assigned to you yet.
+                    </p>
 
                 </div>
 
@@ -169,28 +487,26 @@
     </div>
 
 
-    <!-- ================= RECENT SESSIONS ================= -->
+    <!-- RECENT SESSIONS -->
 
-    <div class="section-heading">
+    <div class="section-title">
 
-        <div>
-            <h3>Recent Class Sessions</h3>
+        <h3>Recent Class Sessions</h3>
 
-            <p>
-                Your latest classroom sessions
-            </p>
-        </div>
+        <p>
+            Your latest classroom sessions.
+        </p>
 
     </div>
 
 
-    <div class="recent-session-card">
+    <div class="session-card">
 
         @if (recentSessions != null && recentSessions.Any())
         {
             <div class="table-responsive">
 
-                <table class="table teacher-session-table mb-0">
+                <table class="table session-table">
 
                     <thead>
 
@@ -209,25 +525,26 @@
                             <tr>
 
                                 <td>
+
                                     <strong>
                                         @session.Subject?.Name
                                     </strong>
 
                                     <br />
 
-                                    <small>
+                                    <small class="text-muted">
                                         @session.Subject?.Code
                                     </small>
+
                                 </td>
 
                                 <td>
                                     @session.Date.ToString("dd MMM yyyy")
                                 </td>
 
-                                <td>
-                                    @DateTime.Today.Add(session.StartTime)
-                                        .ToString("hh:mm tt")
-                                </td>
+                              <td>
+    @DateTime.Today.Add(session.StartTime).ToString("hh:mm tt")
+</td>
 
                             </tr>
                         }
@@ -240,8 +557,9 @@
         }
         else
         {
-            <div class="empty-sessions">
-                <div class="empty-icon">
+            <div class="empty-state">
+
+                <div class="empty-state-icon">
                     🗓️
                 </div>
 
@@ -250,6 +568,7 @@
                 <p>
                     No class sessions have been created yet.
                 </p>
+
             </div>
         }
 

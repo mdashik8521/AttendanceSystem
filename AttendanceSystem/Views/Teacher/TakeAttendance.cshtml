@@ -1,0 +1,117 @@
+@model IEnumerable<AttendanceSystem.Models.Subject>
+
+@{
+    ViewData["Title"] = "Take Attendance";
+}
+
+<style>
+    .attendance-page {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+
+    .attendance-page h2 {
+        margin-bottom: 10px;
+    }
+
+    .subtitle {
+        color: #666;
+        margin-bottom: 30px;
+    }
+
+    .subject-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+
+    .subject-card {
+        border: 1px solid #ddd;
+        border-radius: 12px;
+        padding: 25px;
+        background: white;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .subject-card h3 {
+        margin-top: 0;
+    }
+
+    .subject-code {
+        color: #666;
+        margin-bottom: 20px;
+    }
+
+    .start-btn {
+        width: 100%;
+        padding: 12px;
+        border: none;
+        border-radius: 8px;
+        background: #198754;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    .start-btn:hover {
+        background: #157347;
+    }
+</style>
+
+<div class="attendance-page">
+
+    <h2>📋 Take Attendance</h2>
+
+    <p class="subtitle">
+        Select a subject to start a new class session.
+    </p>
+
+    @if (!Model.Any())
+    {
+        <div>
+            No subjects are assigned to you.
+        </div>
+    }
+    else
+    {
+        <div class="subject-grid">
+
+            @foreach (var subject in Model)
+            {
+                <div class="subject-card">
+
+                    <h3>@subject.Name</h3>
+
+                    <div class="subject-code">
+                        Code: @subject.Code
+                    </div>
+
+                    <div class="subject-code">
+                        Semester: @subject.Semester
+                    </div>
+
+                    <form asp-controller="Teacher"
+                          asp-action="StartSession"
+                          method="post">
+
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden"
+                               name="subjectId"
+                               value="@subject.Id" />
+
+                        <button type="submit"
+                                class="start-btn">
+                            ▶ Start Attendance
+                        </button>
+
+                    </form>
+
+                </div>
+            }
+
+        </div>
+    }
+
+</div>

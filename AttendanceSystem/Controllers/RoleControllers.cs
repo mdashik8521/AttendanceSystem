@@ -230,160 +230,403 @@ public async Task<IActionResult> DeleteSubject(int id)
     }
     
 
+// =========================================================
+// TEACHER CONTROLLER
+// =========================================================
 
-    // =========================================================
-    // TEACHER CONTROLLER
-    // =========================================================
+[Authorize(Roles = "Teacher")]
+public class TeacherController : Controller
+{
+    private readonly AppDbContext _context;
 
-    [Authorize(Roles = "Teacher")]
-    public class TeacherController : Controller
+    public TeacherController(AppDbContext context)
     {
-        private readonly AppDbContext _context;
+        _context = context;
+    }
 
-        public TeacherController(AppDbContext context)
+    // =========================
+    // TEACHER DASHBOARD
+    // =========================
+
+    public async Task<IActionResult> Index()
+    {
+        var userId = User.FindFirst(
+            System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+        var teacher = await _context.Teachers
+            .Include(t => t.User)
+            .Include(t => t.Department)
+            .Include(t => t.Subjects)
+            .FirstOrDefaultAsync(t => t.UserId == userId);
+
+        if (teacher == null)
         {
-            _context = context;
+            return NotFound("Teacher profile not found.");
         }
 
-        public async Task<IActionResult> Index()
-        {
-            var userId = User.FindFirst(
-                System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        var subjectIds = teacher.Subjects
+            .Select(s => s.Id)
+            .ToList();
 
-            var teacher = await _context.Teachers
-                .Include(t => t.User)
-                .Include(t => t.Department)
-                .Include(t => t.Subjects)
-                .FirstOrDefaultAsync(t => t.UserId == userId);
+        var totalSessions = await _context.ClassSessions
+            .CountAsync(cs => subjectIds.Contains(cs.SubjectId));
 
-            if (teacher == null)
-            {
-                return NotFound("Teacher profile not found.");
-            }
+        var totalAttendanceRecords = await _context.AttendanceRecords
+            .CountAsync(ar =>
+                subjectIds.Contains(ar.ClassSession!.SubjectId));
 
-            var subjectIds = teacher.Subjects
-                .Select(s => s.Id)
-                .ToList();
+        // SQLite TimeSpan ordering fix
+        var recentSessions = (await _context.ClassSessions
+            .Include(cs => cs.Subject)
+            .Where(cs => subjectIds.Contains(cs.SubjectId))
+            .OrderByDescending(cs => cs.Date)
+            .ToListAsync())
+            .OrderByDescending(cs => cs.Date)
+            .ThenByDescending(cs => cs.StartTime)
+            .Take(5)
+            .ToList();
 
-            var totalSessions = await _context.ClassSessions
-                .CountAsync(cs => subjectIds.Contains(cs.SubjectId));
+        ViewBag.Teacher = teacher;
+        ViewBag.TotalSubjects = teacher.Subjects.Count;
+        ViewBag.TotalSessions = totalSessions;
+        ViewBag.TotalAttendanceRecords = totalAttendanceRecords;
+        ViewBag.RecentSessions = recentSessions;
 
-            var totalAttendanceRecords = await _context.AttendanceRecords
-                .CountAsync(ar =>
-                    subjectIds.Contains(ar.ClassSession!.SubjectId));
-
-            // SQLite TimeSpan ordering fix
-            var recentSessions = (await _context.ClassSessions
-                .Include(cs => cs.Subject)
-                .Where(cs => subjectIds.Contains(cs.SubjectId))
-                .OrderByDescending(cs => cs.Date)
-                .ToListAsync())
-                .OrderByDescending(cs => cs.Date)
-                .ThenByDescending(cs => cs.StartTime)
-                .Take(5)
-                .ToList();
-
-            ViewBag.Teacher = teacher;
-            ViewBag.TotalSubjects = teacher.Subjects.Count;
-            ViewBag.TotalSessions = totalSessions;
-            ViewBag.TotalAttendanceRecords = totalAttendanceRecords;
-            ViewBag.RecentSessions = recentSessions;
-
-            return View();
-        }
+        return View();
     }
 
 
-    // =========================================================
-    // STUDENT CONTROLLER
-    // =========================================================
+    // =========================
+    // TAKE ATTENDANCE - PAGE
+    // =========================
 
-    [Authorize(Roles = "Student")]
-    public class StudentController : Controller
+    public async Task<IActionResult> TakeAttendance()
     {
-        private readonly AppDbContext _context;
+        var userId = User.FindFirst(
+            System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
-        public StudentController(AppDbContext context)
+        var teacher = await _context.Teachers
+            .Include(t => t.Subjects)
+            .FirstOrDefaultAsync(t => t.UserId == userId);
+
+        if (teacher == null)
         {
-            _context = context;
+            return NotFound("Teacher profile not found.");
         }
 
-        public async Task<IActionResult> Index()
-        {
-            var userId = User.FindFirst(
-                System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-
-            var student = await _context.Students
-                .Include(s => s.User)
-                .Include(s => s.Department)
-                .FirstOrDefaultAsync(s => s.UserId == userId);
-
-            if (student == null)
-            {
-                return NotFound("Student profile not found.");
-            }
-
-            var attendanceRecords = await _context.AttendanceRecords
-                .Include(a => a.ClassSession)
-                    .ThenInclude(cs => cs!.Subject)
-                .Where(a => a.StudentId == student.Id)
-                .OrderByDescending(a => a.MarkedAt)
-                .ToListAsync();
-
-            var total = attendanceRecords.Count;
-
-            var present = attendanceRecords.Count(a =>
-                a.Status == AttendanceSystem.Models.AttendanceStatus.Present);
-
-            var absent = attendanceRecords.Count(a =>
-                a.Status == AttendanceSystem.Models.AttendanceStatus.Absent);
-
-            var late = attendanceRecords.Count(a =>
-                a.Status == AttendanceSystem.Models.AttendanceStatus.Late);
-
-            var percentage = total == 0
-                ? 0
-                : Math.Round((double)present / total * 100, 1);
-
-            ViewBag.Student = student;
-            ViewBag.TotalAttendance = total;
-            ViewBag.Present = present;
-            ViewBag.Absent = absent;
-            ViewBag.Late = late;
-            ViewBag.AttendancePercentage = percentage;
-
-            return View(attendanceRecords);
-        }
-
-
-        // =========================
-        // STUDENT ATTENDANCE
-        // =========================
-
-        public async Task<IActionResult> Attendance()
-        {
-            var userId = User.FindFirst(
-                System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-
-            var student = await _context.Students
-                .FirstOrDefaultAsync(s => s.UserId == userId);
-
-            if (student == null)
-            {
-                return NotFound("Student profile not found.");
-            }
-
-            // SQLite TimeSpan ordering fix
-            var records = (await _context.AttendanceRecords
-                .Include(a => a.ClassSession)
-                    .ThenInclude(cs => cs!.Subject)
-                .Where(a => a.StudentId == student.Id)
-                .OrderByDescending(a => a.ClassSession!.Date)
-                .ToListAsync())
-                .OrderByDescending(a => a.ClassSession!.Date)
-                .ThenByDescending(a => a.ClassSession!.StartTime)
-                .ToList();
-
-            return View(records);
-        }
+        return View(
+            teacher.Subjects
+                .OrderBy(s => s.Name)
+                .ToList()
+        );
     }
+
+
+    // =========================
+    // CREATE CLASS SESSION
+    // =========================
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> StartSession(int subjectId)
+    {
+        var userId = User.FindFirst(
+            System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+        var teacher = await _context.Teachers
+            .Include(t => t.Subjects)
+            .FirstOrDefaultAsync(t => t.UserId == userId);
+
+        if (teacher == null)
+        {
+            return NotFound("Teacher profile not found.");
+        }
+
+        // Make sure subject belongs to this teacher
+        var subject = teacher.Subjects
+            .FirstOrDefault(s => s.Id == subjectId);
+
+        if (subject == null)
+        {
+            return Unauthorized();
+        }
+
+        // Generate unique QR token
+        var token = Guid.NewGuid().ToString("N");
+
+        var session = new ClassSession
+        {
+            SubjectId = subjectId,
+            Date = DateTime.Today,
+            StartTime = DateTime.Now.TimeOfDay,
+            QrToken = token,
+
+            // QR valid for 5 minutes
+            QrExpiresAt = DateTime.Now.AddMinutes(5)
+        };
+
+        _context.ClassSessions.Add(session);
+
+        await _context.SaveChangesAsync();
+
+        return RedirectToAction(
+            nameof(ShowQRCode),
+            new { id = session.Id }
+        );
+    }
+
+
+    // =========================
+    // SHOW QR CODE
+    // =========================
+
+    public async Task<IActionResult> ShowQRCode(int id)
+    {
+        var userId = User.FindFirst(
+            System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+        var teacher = await _context.Teachers
+            .FirstOrDefaultAsync(t => t.UserId == userId);
+
+        if (teacher == null)
+        {
+            return NotFound("Teacher profile not found.");
+        }
+
+        var session = await _context.ClassSessions
+            .Include(cs => cs.Subject)
+            .FirstOrDefaultAsync(cs => cs.Id == id);
+
+        if (session == null)
+        {
+            return NotFound("Class session not found.");
+        }
+
+        // Make sure this session belongs to this teacher
+        var ownsSubject = await _context.Subjects
+            .AnyAsync(s =>
+                s.Id == session.SubjectId &&
+                s.TeacherId == teacher.Id);
+
+        if (!ownsSubject)
+        {
+            return Unauthorized();
+        }
+
+        return View(session);
+    }
+}
+
+ // =========================================================
+// STUDENT CONTROLLER
+// =========================================================
+
+[Authorize(Roles = "Student")]
+public class StudentController : Controller
+{
+    private readonly AppDbContext _context;
+
+    public StudentController(AppDbContext context)
+    {
+        _context = context;
+    }
+
+
+    // =========================
+    // STUDENT DASHBOARD
+    // =========================
+
+    
+
+       
+public async Task<IActionResult> Index()
+{
+    var userId = User.FindFirst(
+        System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+    var student = await _context.Students
+        .Include(s => s.User)
+        .Include(s => s.Department)
+        .FirstOrDefaultAsync(s => s.UserId == userId);
+
+    if (student == null)
+    {
+        return NotFound("Student profile not found.");
+    }
+
+    var attendanceRecords = await _context.AttendanceRecords
+        .Include(a => a.ClassSession)
+            .ThenInclude(cs => cs!.Subject)
+        .Where(a => a.StudentId == student.Id)
+        .ToListAsync();
+
+    var totalClasses = attendanceRecords.Count;
+
+    var attendedClasses = attendanceRecords.Count(a =>
+        a.Status == AttendanceStatus.Present);
+
+    var percentage = totalClasses == 0
+        ? 0
+        : Math.Round(
+            (double)attendedClasses / totalClasses * 100,
+            1);
+
+    var subjectSummaries = attendanceRecords
+        .Where(a => a.ClassSession != null &&
+                    a.ClassSession.Subject != null)
+        .GroupBy(a => new
+        {
+            a.ClassSession!.Subject!.Id,
+            a.ClassSession.Subject.Name
+        })
+        .Select(g => new SubjectAttendanceSummary
+        {
+            SubjectName = g.Key.Name,
+            TotalClasses = g.Count(),
+            AttendedClasses = g.Count(a =>
+                a.Status == AttendanceStatus.Present),
+            
+        })
+        .ToList();
+
+    var model = new StudentDashboardViewModel
+    {
+        StudentName = student.User?.FullName ?? "Student",
+        RollNumber = student.EnrollmentNo,
+        Department = student.Department?.Name ?? "N/A",
+        OverallAttendancePercentage = percentage,
+        TotalAttended = attendedClasses,
+        TotalClassesHeld = totalClasses,
+        SubjectSummaries = subjectSummaries
+    };
+
+    return View(model);
+}
+
+
+
+    
+
+
+    // =========================
+    // STUDENT ATTENDANCE HISTORY
+    // =========================
+
+    public async Task<IActionResult> Attendance()
+    {
+        var userId = User.FindFirst(
+            System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+        var student = await _context.Students
+            .FirstOrDefaultAsync(s => s.UserId == userId);
+
+        if (student == null)
+        {
+            return NotFound("Student profile not found.");
+        }
+
+        var records = (await _context.AttendanceRecords
+            .Include(a => a.ClassSession)
+                .ThenInclude(cs => cs!.Subject)
+            .Where(a => a.StudentId == student.Id)
+            .OrderByDescending(a => a.ClassSession!.Date)
+            .ToListAsync())
+            .OrderByDescending(a => a.ClassSession!.Date)
+            .ThenByDescending(a => a.ClassSession!.StartTime)
+            .ToList();
+
+        return View(records);
+    }
+
+
+    // =========================
+    // SCAN QR PAGE
+    // =========================
+
+    [HttpGet]
+    public IActionResult Scan()
+    {
+        return View();
+    }
+
+
+    // =========================
+    // MARK ATTENDANCE
+    // =========================
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> MarkAttendance(string token)
+    {
+        if (string.IsNullOrWhiteSpace(token))
+        {
+            TempData["Error"] = "Invalid QR code.";
+            return RedirectToAction(nameof(Scan));
+        }
+
+        var userId = User.FindFirst(
+            System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+        var student = await _context.Students
+            .FirstOrDefaultAsync(s => s.UserId == userId);
+
+        if (student == null)
+        {
+            return NotFound("Student profile not found.");
+        }
+
+        // Find session using QR token
+        var session = await _context.ClassSessions
+            .Include(cs => cs.Subject)
+            .FirstOrDefaultAsync(cs => cs.QrToken == token);
+
+        if (session == null)
+        {
+            TempData["Error"] = "Invalid QR code.";
+            return RedirectToAction(nameof(Scan));
+        }
+
+        // Check QR expiry
+        if (!session.QrExpiresAt.HasValue ||
+            DateTime.Now > session.QrExpiresAt.Value)
+        {
+            TempData["Error"] = "This QR code has expired.";
+            return RedirectToAction(nameof(Scan));
+        }
+
+        // Check duplicate attendance
+        var alreadyMarked = await _context.AttendanceRecords
+            .AnyAsync(a =>
+                a.ClassSessionId == session.Id &&
+                a.StudentId == student.Id);
+
+        if (alreadyMarked)
+        {
+            TempData["Error"] =
+                "Your attendance has already been marked for this class.";
+
+            return RedirectToAction(nameof(Scan));
+        }
+
+        // Create attendance record
+        var attendance = new AttendanceRecord
+        {
+            ClassSessionId = session.Id,
+            StudentId = student.Id,
+            Status = AttendanceStatus.Present,
+            MarkedAt = DateTime.Now
+        };
+
+        _context.AttendanceRecords.Add(attendance);
+
+        await _context.SaveChangesAsync();
+
+        TempData["Success"] =
+            $"Attendance marked successfully for {session.Subject?.Name}.";
+
+        return RedirectToAction(nameof(Scan));
+    }
+}
+
+
+

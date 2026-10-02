@@ -578,6 +578,73 @@ namespace AttendanceSystem.Data
                 }
             }
 
+
+// ==========================================
+// DEMO STUDENT ACCOUNT
+// ==========================================
+
+var demoStudent = await userManager.FindByEmailAsync(
+    "student@attendance.com");
+
+if (demoStudent == null)
+{
+    demoStudent = new ApplicationUser
+    {
+        UserName = "student@attendance.com",
+        Email = "student@attendance.com",
+        FullName = "Demo Student",
+        EmailConfirmed = true
+    };
+
+    var result = await userManager.CreateAsync(
+        demoStudent,
+        "Student@123"
+    );
+
+    if (!result.Succeeded)
+    {
+        throw new Exception(
+            "Failed to create demo student: " +
+            string.Join(
+                ", ",
+                result.Errors.Select(e => e.Description)
+            )
+        );
+    }
+}
+
+if (!await userManager.IsInRoleAsync(
+    demoStudent,
+    "Student"))
+{
+    await userManager.AddToRoleAsync(
+        demoStudent,
+        "Student");
+}
+
+var demoStudentProfile =
+    await context.Students
+        .FirstOrDefaultAsync(
+            s => s.UserId == demoStudent.Id);
+
+if (demoStudentProfile == null)
+{
+    context.Students.Add(
+        new Student
+        {
+            UserId = demoStudent.Id,
+            EnrollmentNo = "DEMO001",
+            Semester = 5,
+            DepartmentId = departments[0].Id
+        }
+    );
+
+    await context.SaveChangesAsync();
+}
+
+
+
+
             // ==========================================
             // 7. TEACHER NAMES - 20 TEACHERS
             // ==========================================
